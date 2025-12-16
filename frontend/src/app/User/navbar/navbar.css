@@ -1,0 +1,135 @@
+.navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1030;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+/* Button hover effects */
+.btn {
+  transition: all 0.2s ease-in-out;
+  border-width: 1.5px;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Dropdown styling */
+.dropdown-menu {
+  border: none;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  padding: 0.5rem 0;
+  margin-top: 0.5rem;
+}
+
+.dropdown-item {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin: 0 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+  transform: translateX(4px);
+}
+
+.dropdown-header {
+  font-weight: 600;
+  color: #495057;
+  padding: 0.75rem 1rem 0.5rem;
+}
+
+/* Badge styling */
+.badge {
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Enhanced notification styling */
+.notification-item {
+  position: relative;
+}
+
+.notification-item .dropdown-item {
+  padding: 0.75rem 1rem;
+  margin: 0;
+  border-radius: 0;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.notification-item:last-child .dropdown-item {
+  border-bottom: none;
+}
+
+.notification-item .dropdown-item:hover {
+  background-color: #f8f9fa;
+  transform: none;
+}
+
+.notification-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #007bff;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+/* Notification type colors */
+.text-purple {
+  color: #6f42c1 !important;
+}
+
+/* Action buttons in notifications */
+.notification-item .btn-sm {
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  border-radius: 4px;
+}
+
+/* Scrollbar for notifications dropdown */
+.dropdown-menu::-webkit-scrollbar {
+  width: 4px;
+}
+
+.dropdown-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 2px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .d-flex.gap-3 {
+    gap: 0.5rem !important;
+  }
+
+  .btn-sm {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .btn .me-1 {
+    display: none;
+  }
+
+  /* Mobile notification dropdown adjustments */
+  .dropdown-menu {
+    width: 300px !important;
+    max-width: 90vw;
+  }
+}

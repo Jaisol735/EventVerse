@@ -1,0 +1,231 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0 fw-bold">
+          <i class="fas fa-bell me-2 text-primary"></i>
+          Notifications
+        </h4>
+        <span *ngIf="unreadCount > 0" class="badge bg-danger rounded-pill fs-6">
+          {{ unreadCount }}
+        </span>
+      </div>
+
+      <!-- Added committee management buttons -->
+      <div class="mb-4">
+        <div class="d-flex gap-3">
+          <button 
+            class="btn btn-primary"
+            (click)="showCreateCommitteeForm()"
+            [disabled]="showCreateCommittee || showJoinCommittee">
+            <i class="fas fa-plus me-2"></i>
+            Create Committee
+          </button>
+          <button 
+            class="btn btn-success"
+            (click)="showJoinCommitteeForm()"
+            [disabled]="showCreateCommittee || showJoinCommittee">
+            <i class="fas fa-user-plus me-2"></i>
+            Join Committee
+          </button>
+        </div>
+      </div>
+
+      <!-- Create Committee Form -->
+      <div *ngIf="showCreateCommittee" class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-users me-2"></i>
+            Create New Committee
+          </h5>
+        </div>
+        <div class="card-body">
+          <form (ngSubmit)="submitCommitteeRequest()">
+            <div class="mb-3">
+              <label for="committeeName" class="form-label">Committee Name *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="committeeName"
+                [(ngModel)]="committeeRequest.name"
+                name="committeeName"
+                placeholder="Enter committee name"
+                required>
+            </div>
+            <div class="mb-3">
+              <label for="committeeDescription" class="form-label">Description *</label>
+              <textarea 
+                class="form-control" 
+                id="committeeDescription"
+                [(ngModel)]="committeeRequest.description"
+                name="committeeDescription"
+                rows="4"
+                placeholder="Describe the committee's purpose and activities"
+                required></textarea>
+            </div>
+            <div class="d-flex gap-2">
+              <button 
+                type="submit" 
+                class="btn btn-primary"
+                [disabled]="!committeeRequest.name || !committeeRequest.description">
+                <i class="fas fa-paper-plane me-2"></i>
+                Submit Request
+              </button>
+              <button 
+                type="button" 
+                class="btn btn-secondary"
+                (click)="cancelForms()">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Join Committee Form -->
+      <div *ngIf="showJoinCommittee" class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-user-plus me-2"></i>
+            Join Committee
+          </h5>
+        </div>
+        <div class="card-body">
+          <!-- Committee Selection -->
+          <div *ngIf="!selectedCommitteeId" class="mb-3">
+            <h6>Select a Committee:</h6>
+            <div class="row">
+              <div *ngFor="let committee of availableCommittees" class="col-md-6 mb-3">
+                <div class="card h-100 committee-card" (click)="selectCommittee(committee.committee_id)">
+                  <div class="card-body">
+                    <h6 class="card-title">{{ committee.name }}</h6>
+                    <p class="card-text small">{{ committee.description }}</p>
+                    <small class="text-muted">
+                      Head: {{ committee.head_name }} | Members: {{ committee.member_count }}
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-secondary" (click)="cancelForms()">Cancel</button>
+          </div>
+
+          <!-- Skills Description Form -->
+          <div *ngIf="selectedCommitteeId">
+            <form (ngSubmit)="submitJoinRequest()">
+              <div class="mb-3">
+                <label for="skillsDescription" class="form-label">Describe Your Skills *</label>
+                <textarea 
+                  class="form-control" 
+                  id="skillsDescription"
+                  [(ngModel)]="joinRequest.skills_description"
+                  name="skillsDescription"
+                  rows="4"
+                  placeholder="Describe your skills, experience, and what you can contribute to the committee"
+                  required></textarea>
+              </div>
+              <div class="d-flex gap-2">
+                <button 
+                  type="submit" 
+                  class="btn btn-success"
+                  [disabled]="!joinRequest.skills_description">
+                  <i class="fas fa-paper-plane me-2"></i>
+                  Submit Application
+                </button>
+                <button 
+                  type="button" 
+                  class="btn btn-secondary"
+                  (click)="cancelForms()">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loading" class="text-center py-4">
+        <div class="spinner-border spinner-border-sm text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="text-muted mt-2 mb-0">Loading notifications...</p>
+      </div>
+
+      <!-- Notifications List -->
+      <div *ngIf="!loading" class="notifications-list">
+        <div 
+          *ngFor="let notification of notifications" 
+          class="card mb-3 notification-item"
+          [class.border-primary]="!notification.is_read"
+          (click)="markAsRead(notification)">
+          
+          <div class="card-body">
+            <!-- Notification Content -->
+            <div class="d-flex align-items-start">
+              <div class="notification-icon me-3">
+                <i [class]="getNotificationIcon(notification.type) + ' ' + getNotificationColor(notification.type) + ' fs-4'"></i>
+              </div>
+              
+              <div class="flex-grow-1">
+                <div class="notification-message mb-2">
+                  {{ notification.message }}
+                </div>
+                
+                <div class="notification-meta d-flex justify-content-between align-items-center mb-2">
+                  <small class="text-muted">
+                    {{ getTimeAgo(notification.created_at) }}
+                  </small>
+                  
+                  <div *ngIf="notification.sender_name" class="text-muted small">
+                    from {{ notification.sender_name }}
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div *ngIf="canTakeAction(notification)" class="notification-actions mb-2">
+                  <button 
+                    class="btn btn-success btn-sm me-2"
+                    (click)="acceptNotification(notification); $event.stopPropagation()">
+                    <i class="fas fa-check me-1"></i>
+                    Accept
+                  </button>
+                  <button 
+                    class="btn btn-outline-danger btn-sm"
+                    (click)="declineNotification(notification); $event.stopPropagation()">
+                    <i class="fas fa-times me-1"></i>
+                    Decline
+                  </button>
+                </div>
+
+                <!-- Status Badge -->
+                <div *ngIf="notification.status !== 'pending'">
+                  <span 
+                    class="badge"
+                    [class.bg-success]="notification.status === 'accepted'"
+                    [class.bg-danger]="notification.status === 'declined'"
+                    [class.bg-secondary]="notification.status === 'completed'">
+                    {{ notification.status | titlecase }}
+                  </span>
+                </div>
+              </div>
+              
+              <!-- Unread indicator -->
+              <div *ngIf="!notification.is_read" class="ms-2">
+                <span class="badge bg-primary rounded-pill">New</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="notifications.length === 0" class="text-center py-5">
+          <i class="fas fa-bell-slash fs-1 text-muted mb-3"></i>
+          <h6 class="text-muted">No notifications yet</h6>
+          <p class="text-muted small mb-0">You'll see notifications here when you receive them.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

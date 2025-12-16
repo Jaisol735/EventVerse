@@ -1,0 +1,4 @@
+/* simple spacing + responsive styles */
+:host {
+  display: block;
+}

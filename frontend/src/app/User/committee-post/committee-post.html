@@ -1,0 +1,112 @@
+<div class="committee-posts-container">
+  <!-- Committee Header -->
+  <div class="committee-header mb-4">
+    <div class="d-flex align-items-center">
+      <div class="committee-avatar me-3">
+        <i class="fas fa-users text-primary"></i>
+      </div>
+      <div>
+        <h5 class="mb-0 fw-bold">{{ committee.name }}</h5>
+        <p class="text-muted mb-0">{{ committee.description }}</p>
+        <small class="text-muted">
+          <i class="fas fa-user me-1"></i>
+          Head: {{ committee.head_name || 'Unknown' }}
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading posts...</span>
+    </div>
+    <p class="text-muted mt-2">Loading committee posts...</p>
+  </div>
+
+  <!-- Posts List -->
+  <div *ngIf="!loading && posts.length > 0" class="posts-list">
+    <div *ngFor="let post of posts" class="post-card mb-4">
+      <!-- Post Header -->
+      <div class="post-header">
+        <div class="d-flex align-items-center">
+          <img src="/placeholder.svg?height=40&width=40" alt="User" class="rounded-circle me-3" width="40" height="40">
+          <div>
+            <h6 class="mb-0 fw-bold">user_{{ post.author_id }}</h6>
+            <small class="text-muted">{{ getTimeAgo(post.created_at) }}</small>
+          </div>
+        </div>
+        <div class="committee-badge">
+          <i class="fas fa-users me-1"></i>
+          {{ committee.name }}
+        </div>
+      </div>
+
+      <!-- Post Media -->
+      <div class="post-media" (click)="openPost(post)" style="cursor: pointer;">
+        <img *ngIf="post.type === 'image'" [src]="post.cloudinary_url" alt="Post" class="w-100">
+        <video *ngIf="post.type === 'video'" [src]="post.cloudinary_url" class="w-100" controls></video>
+      </div>
+
+      <!-- Post Content -->
+      <div class="post-content">
+        <div class="post-actions mb-3">
+          <button class="btn btn-link p-0 me-3" (click)="likePost(post)">
+            <i [class]="isLikedByUser(post) ? 'fas fa-heart text-danger' : 'far fa-heart'" class="fs-5"></i>
+            <span class="ms-1">{{ post.likes.length }}</span>
+          </button>
+          <button class="btn btn-link p-0 me-3">
+            <i class="far fa-comment fs-5"></i>
+            <span class="ms-1">{{ post.comments.length }}</span>
+          </button>
+          <button class="btn btn-link p-0">
+            <i class="far fa-share fs-5"></i>
+          </button>
+        </div>
+
+        <div class="post-description mb-2">
+          <strong>user_{{ post.author_id }}</strong>
+          {{ post.description_user || post.description_ai }}
+        </div>
+
+        <div *ngIf="post.hashtags_ai.length > 0" class="post-hashtags mb-3">
+          <span *ngFor="let hashtag of post.hashtags_ai" class="hashtag me-2">#{{ hashtag }}</span>
+        </div>
+
+        <!-- Comments -->
+        <div *ngIf="post.comments.length > 0" class="comments-section mb-3">
+          <div *ngFor="let comment of post.comments" class="comment-item mb-2">
+            <strong>user_{{ comment.user_id }}</strong>
+            {{ comment.text }}
+            <small class="text-muted ms-2">{{ getTimeAgo(comment.timestamp) }}</small>
+          </div>
+        </div>
+
+        <!-- Add Comment -->
+        <div class="add-comment">
+          <div class="input-group">
+            <input 
+              type="text" 
+              class="form-control border-0 bg-light" 
+              placeholder="Add a comment..."
+              [(ngModel)]="newComment[post._id]"
+              (keyup.enter)="addComment(post)">
+            <button 
+              class="btn btn-link text-primary"
+              (click)="addComment(post)"
+              [disabled]="!newComment[post._id]?.trim()">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && posts.length === 0" class="empty-state text-center py-5">
+    <i class="fas fa-images fs-1 text-muted mb-3"></i>
+    <h5 class="text-muted">No posts yet</h5>
+    <p class="text-muted">{{ committee.name }} hasn't posted anything yet. Check back later!</p>
+  </div>
+</div>

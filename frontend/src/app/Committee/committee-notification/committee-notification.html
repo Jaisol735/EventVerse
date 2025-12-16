@@ -1,0 +1,38 @@
+<main class="p-4 max-w-3xl mx-auto">
+  <header class="flex items-center justify-between mb-4">
+    <h1 class="text-xl font-semibold">Committee Join Requests</h1>
+    <button class="px-3 py-1 rounded bg-blue-600 text-white" (click)="back()">Back</button>
+  </header>
+
+  <section *ngIf="loading" class="text-gray-500">Loading notifications…</section>
+  <section *ngIf="error" class="text-red-600">{{ error }}</section>
+
+  <ul *ngIf="!loading && notifications.length" class="space-y-3">
+    <li *ngFor="let n of notifications" class="p-3 border rounded flex items-start justify-between gap-3">
+      <div>
+        <p class="font-medium">{{ n.sender_name || 'User ' + n.sender_id }}</p>
+        <p class="text-sm text-gray-600">{{ n.message }}</p>
+        <p class="text-xs text-gray-500 mt-1">{{ n.created_at | date:'medium' }}</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button
+          class="px-3 py-1 rounded bg-green-600 text-white disabled:opacity-50"
+          [disabled]="acting.has(n.notification_id)"
+          (click)="accept(n)"
+        >
+          Accept
+        </button>
+        <button
+          class="px-3 py-1 rounded bg-red-600 text-white disabled:opacity-50"
+          [disabled]="acting.has(n.notification_id)"
+          (click)="reject(n)"
+        >
+          Reject
+        </button>
+      </div>
+    </li>
+  </ul>
+
+  <p *ngIf="!loading && !notifications.length" class="text-gray-600">No pending join requests.</p>
+</main>
+

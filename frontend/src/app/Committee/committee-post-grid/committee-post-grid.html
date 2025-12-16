@@ -1,0 +1,202 @@
+<div class="committee-post-grid">
+  <!-- Header -->
+  <div class="grid-header d-flex justify-content-between align-items-center mb-4">
+    <h5 class="mb-0 fw-bold">
+      <i class="fas fa-images me-2 text-primary"></i>
+      Committee Posts
+    </h5>
+    @if (isCommitteeHead) {
+      <button 
+        class="btn btn-primary btn-sm"
+        (click)="createNewPost()"
+      >
+        <i class="fas fa-plus me-1"></i>
+        Create Post
+      </button>
+    }
+  </div>
+
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading posts...</span>
+      </div>
+      <p class="text-muted mt-2">Loading committee posts...</p>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading && posts.length === 0) {
+    <div class="empty-state text-center py-5">
+      <div class="empty-icon mb-3">
+        <i class="fas fa-images fa-4x text-muted"></i>
+      </div>
+      <h5 class="text-muted mb-2">No posts yet</h5>
+      <p class="text-muted mb-3">
+        {{ isCommitteeHead ? 'Be the first to share something with your committee!' : 'No posts have been shared by this committee yet.' }}
+      </p>
+      @if (isCommitteeHead) {
+        <button 
+          class="btn btn-primary"
+          (click)="createNewPost()"
+        >
+          <i class="fas fa-plus me-2"></i>
+          Create First Post
+        </button>
+      }
+    </div>
+  }
+
+  <!-- Posts Grid -->
+  @if (!loading && posts.length > 0) {
+    <div class="posts-grid">
+      <div class="row g-3">
+        <div class="col-md-4 col-sm-6" *ngFor="let post of posts">
+          <div class="post-card" (click)="openPostModal(post)">
+            <div class="post-image-container">
+              <img 
+                [src]="post.cloudinary_url" 
+                [alt]="post.description_user || post.description_ai"
+                class="post-image"
+                loading="lazy"
+              >
+              <div class="post-overlay">
+                <div class="post-stats">
+                  <span class="stat-item">
+                    <i class="fas fa-heart"></i>
+                    {{ getLikeCount(post) }}
+                  </span>
+                  <span class="stat-item">
+                    <i class="fas fa-comment"></i>
+                    {{ getCommentCount(post) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="post-info p-2">
+              <p class="post-description mb-1">
+                {{ (post.description_user || post.description_ai) | slice:0:60 }}
+                @if ((post.description_user || post.description_ai).length > 60) { ... }
+              </p>
+              <small class="text-muted">{{ getTimeAgo(post.created_at) }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Post Modal -->
+  @if (showPostModal && selectedPost) {
+    <div 
+      class="modal fade show d-block" 
+      tabindex="-1"
+      style="background-color: rgba(0,0,0,0.5);"
+    >
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0">
+            <h5 class="modal-title">Post Details</h5>
+            <button type="button" class="btn-close" (click)="closePostModal()"></button>
+          </div>
+          <div class="modal-body p-0">
+            <div class="row g-0">
+              <!-- Post Image -->
+              <div class="col-md-8">
+                <img 
+                  [src]="selectedPost.cloudinary_url" 
+                  [alt]="selectedPost.description_user || selectedPost.description_ai"
+                  class="img-fluid w-100"
+                  style="max-height: 500px; object-fit: cover;"
+                >
+              </div>
+              
+              <!-- Post Details -->
+              <div class="col-md-4">
+                <div class="post-details p-3">
+                  <!-- Description -->
+                  <div class="post-description mb-3">
+                    <p class="mb-2">{{ selectedPost.description_user || selectedPost.description_ai }}</p>
+                    @if (selectedPost.hashtags_ai.length > 0) {
+                      <div class="hashtags">
+                        <span 
+                          *ngFor="let hashtag of selectedPost.hashtags_ai" 
+                          class="badge bg-light text-primary me-1"
+                        >
+                          #{{ hashtag }}
+                        </span>
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Post Stats -->
+                  <div class="post-actions mb-3">
+                    <button 
+                      class="btn btn-link p-0 me-3"
+                      [class.text-danger]="isLikedByUser(selectedPost)"
+                      (click)="likePost(selectedPost)"
+                    >
+                      <i class="fas fa-heart me-1"></i>
+                      {{ getLikeCount(selectedPost) }} likes
+                    </button>
+                    <span class="text-muted">
+                      <i class="fas fa-comment me-1"></i>
+                      {{ getCommentCount(selectedPost) }} comments
+                    </span>
+                  </div>
+
+                  <!-- Comments -->
+                  <div class="comments-section">
+                    <h6 class="fw-bold mb-2">Comments</h6>
+                    <div class="comments-list mb-3" style="max-height: 200px; overflow-y: auto;">
+                      @if (selectedPost.comments.length === 0) {
+                        <div class="text-muted text-center py-2">
+                          No comments yet
+                        </div>
+                      }
+                      <div *ngFor="let comment of selectedPost.comments" class="comment mb-2">
+                        <div class="d-flex">
+                          <div class="comment-avatar me-2">
+                            <i class="fas fa-user-circle fa-lg text-muted"></i>
+                          </div>
+                          <div class="comment-content flex-grow-1">
+                            <div class="comment-text bg-light p-2 rounded">
+                              <small class="fw-bold">User {{ comment.user_id }}</small>
+                              <p class="mb-0">{{ comment.text }}</p>
+                            </div>
+                            <small class="text-muted">{{ getTimeAgo(comment.timestamp) }}</small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Add Comment -->
+                    <div class="add-comment">
+                      <div class="input-group">
+                        <input 
+                          type="text" 
+                          class="form-control" 
+                          placeholder="Add a comment..."
+                          [(ngModel)]="newComment[selectedPost._id]"
+                          (keyup.enter)="addComment(selectedPost)"
+                        >
+                        <button 
+                          class="btn btn-primary" 
+                          (click)="addComment(selectedPost)"
+                          [disabled]="!newComment[selectedPost._id].trim()"
+                        >
+                          <i class="fas fa-paper-plane"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,44 @@
+<div class="container mt-5">
+  <div class="d-flex gap-3 mb-4">
+    <button class="btn btn-primary btn-animate" (click)="imageInput.click()">Upload Image</button>
+    <input #imageInput type="file" accept="image/*" style="display:none" (change)="onFileSelected($event, 'image')" />
+
+    <button class="btn btn-success btn-animate" (click)="videoInput.click()">Upload Video</button>
+    <input #videoInput type="file" accept="video/*" style="display:none" (change)="onFileSelected($event, 'video')" />
+  </div>
+
+  @if (showForm) {
+    <form (submit)="upload($event)" class="card p-4 shadow-sm" style="border-radius: 10px;">
+      <div class="mb-3">
+        @if (userId) {
+          <label class="form-label">User ID: <b>{{ userId }}</b></label>
+        }
+        @if (committeeId) {
+          <label class="form-label ms-3">Committee ID: <b>{{ committeeId }}</b></label>
+        }
+        @if (uploadType) {
+          <label class="form-label ms-3">Type: <b>{{ uploadType }}</b></label>
+        }
+      </div>
+
+      <div class="mb-3">
+        <p class="fw-semibold">Selected: {{ selectedFile?.name || 'No file selected' }}</p>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-animate" [disabled]="uploading">Upload</button>
+
+      @if(uploading){
+        <div class="mt-2 text-warning fw-semibold">Post is uploading...</div>
+      }
+      @if(uploadError){
+        <div class="mt-2 text-danger fw-semibold">{{ uploadError }}</div>
+      }
+    </form>
+  }
+
+  @if (uploadSuccess) {
+    <div class="alert alert-success mt-3" role="alert">
+      Post uploaded successfully!
+    </div>
+  }
+</div>

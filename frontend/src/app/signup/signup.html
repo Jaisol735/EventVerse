@@ -1,0 +1,122 @@
+
+<div class="container-fluid vh-100 d-flex align-items-center justify-content-center" style="background-color: #fafafa;">
+  <div class="row w-100">
+    <div class="col-12 col-md-6 col-lg-4 mx-auto">
+      <div class="card card-instagram shadow-sm">
+        <div class="card-body p-4">
+          <!-- Instagram Logo -->
+          <div class="text-center mb-4">
+            <h1 class="text-instagram display-4 mb-3">EventVerse</h1>
+          </div>
+
+          <!-- Signup Form -->
+          <form (ngSubmit)="onSubmit()" #signupForm="ngForm">
+            <!-- Full Name Input -->
+            <div class="mb-3">
+              <input 
+                type="text" 
+                class="form-control form-control-lg" 
+                placeholder="Full Name"
+                [(ngModel)]="userData.name"
+                name="name"
+                required
+                #name="ngModel"
+                [class.is-invalid]="name.invalid && name.touched">
+              <div class="invalid-feedback" *ngIf="name.invalid && name.touched">
+                Please enter your full name.
+              </div>
+            </div>
+
+            <!-- Email Input -->
+            <div class="mb-3">
+              <input 
+                type="email" 
+                class="form-control form-control-lg" 
+                placeholder="Email"
+                [(ngModel)]="userData.email"
+                name="email"
+                required
+                #email="ngModel"
+                [class.is-invalid]="email.invalid && email.touched">
+              <div class="invalid-feedback" *ngIf="email.invalid && email.touched">
+                Please enter a valid email address.
+              </div>
+            </div>
+
+            <!-- Password Input -->
+            <div class="mb-3">
+              <input 
+                type="password" 
+                class="form-control form-control-lg" 
+                placeholder="Password"
+                [(ngModel)]="userData.password"
+                name="password"
+                required
+                minlength="6"
+                #password="ngModel"
+                [class.is-invalid]="password.invalid && password.touched">
+              <div class="invalid-feedback" *ngIf="password.invalid && password.touched">
+                Password must be at least 6 characters long.
+              </div>
+            </div>
+
+            <!-- Confirm Password Input -->
+            <div class="mb-3">
+              <input 
+                type="password" 
+                class="form-control form-control-lg" 
+                placeholder="Confirm Password"
+                [(ngModel)]="confirmPassword"
+                name="confirmPassword"
+                required
+                #confirmPass="ngModel"
+                [class.is-invalid]="confirmPass.touched && userData.password !== confirmPassword">
+              <div class="invalid-feedback" *ngIf="confirmPass.touched && userData.password !== confirmPassword">
+                Passwords do not match.
+              </div>
+            </div>
+
+            <!-- Terms Text -->
+            <p class="text-muted small text-center mb-3">
+              By signing up, you agree to our 
+              <a href="#" class="text-decoration-none">Terms</a>, 
+              <a href="#" class="text-decoration-none">Data Policy</a> and 
+              <a href="#" class="text-decoration-none">Cookies Policy</a>.
+            </p>
+
+            <!-- Error Message -->
+            <div class="alert alert-danger" *ngIf="error">
+              <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+            </div>
+
+            <!-- Signup Button -->
+            <button 
+              type="submit" 
+              class="btn btn-instagram btn-lg w-100 mb-3"
+              [disabled]="loading || signupForm.invalid || userData.password !== confirmPassword">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ loading ? 'Signing up...' : 'Sign Up' }}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Login Link -->
+      <div class="card card-instagram mt-3">
+        <div class="card-body text-center py-3">
+          <span class="text-muted">Have an account? </span>
+          <a routerLink="/login" class="text-instagram text-decoration-none fw-bold">Log in</a>
+        </div>
+      </div>
+
+      <!-- Get the App -->
+      <div class="text-center mt-3">
+        <p class="text-muted small mb-3">Get the app.</p>
+        <div class="d-flex justify-content-center gap-2">
+          <img [src]="appimage" alt="Download on App Store" class="img-fluid" style="height: 40px;">
+          <img [src]="appimage" alt="Get it on Google Play" class="img-fluid" style="height: 40px;">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

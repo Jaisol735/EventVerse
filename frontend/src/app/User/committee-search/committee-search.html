@@ -1,0 +1,148 @@
+<div class="committee-search-container">
+  <!-- Search Input -->
+  <div class="search-input-container position-relative">
+    <div class="input-group">
+      <span class="input-group-text bg-light border-end-0">
+        <i class="fas fa-search text-muted"></i>
+      </span>
+      <input
+        type="text"
+        class="form-control bg-light border-start-0"
+        placeholder="Search for committees..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearchInput()"
+        (focus)="onFocus()"
+        (blur)="onBlur()"
+        autocomplete="off"
+      />
+      <button
+        *ngIf="selectedCommittee"
+        class="btn btn-outline-secondary"
+        type="button"
+        (click)="clearSelection()"
+        title="Clear selection"
+      >
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    @if(loading){
+      <div class="search-loading">
+      <div class="spinner-border spinner-border-sm text-primary" role="status">
+        <span class="visually-hidden">Searching...</span>
+      </div>
+    </div>
+    }
+    <!-- Loading Indicator -->
+    @if(showResults && searchResults.length > 0){
+       <!-- Search Results Dropdown -->
+    <div  class="search-results">
+      <div
+        *ngFor="let committee of searchResults"
+        class="search-result-item"
+        (click)="selectCommittee(committee)"
+      >
+        <div class="d-flex align-items-center">
+          <div class="committee-avatar me-3">
+            <i class="fas fa-users text-primary"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="committee-name fw-bold">{{ committee.name }}</div>
+            <div class="committee-description text-muted small">
+              {{ committee.description }}
+            </div>
+            <div class="committee-meta text-muted small">
+              <i class="fas fa-user me-1"></i>
+              Head: {{ committee.head_name || 'Unknown' }}
+              <span *ngIf="committee.member_count" class="ms-2">
+                <i class="fas fa-users me-1"></i>
+                {{ committee.member_count }} members
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    }
+    @if(showResults && searchResults.length === 0 && searchQuery.length >= 2 && !loading){
+      <!-- No Results -->
+    <div class="search-results">
+      <div class="text-center py-3 text-muted">
+        <i class="fas fa-search mb-2"></i>
+        <div>No committees found for "{{ searchQuery }}"</div>
+      </div>
+    </div>
+    }
+    
+  </div>
+  @if(selectedCommittee){
+    <!-- Selected Committee Options -->
+  <div class="selected-committee-options mt-3">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-3">
+          <div class="committee-avatar me-3">
+            <i class="fas fa-users text-primary"></i>
+          </div>
+          <div>
+            <h6 class="mb-0 fw-bold">{{ selectedCommittee.name }}</h6>
+            <small class="text-muted">{{ selectedCommittee.description }}</small>
+          </div>
+        </div>
+
+        <!-- Mode Selection -->
+        <div class="mode-selection">
+          <div class="btn-group w-100" role="group">
+            <input
+              type="radio"
+              class="btn-check"
+              name="mode"
+              id="posts-mode"
+              value="posts"
+              [(ngModel)]="selectedMode"
+              (change)="onModeChange('posts')"
+            />
+            <label class="btn btn-outline-primary" for="posts-mode">
+              <i class="fas fa-images me-2"></i>
+              Posts
+            </label>
+
+            <input
+              type="radio"
+              class="btn-check"
+              name="mode"
+              id="chat-mode"
+              value="chat"
+              [(ngModel)]="selectedMode"
+              (change)="onModeChange('chat')"
+            />
+            <label class="btn btn-outline-primary" for="chat-mode">
+              <i class="fas fa-comments me-2"></i>
+              Chat
+            </label>
+          </div>
+        </div>
+
+        <!-- Mode Description -->
+        <div class="mode-description mt-2">
+          <small class="text-muted">
+            @if(selectedMode === 'posts'){
+              <span>
+              <i class="fas fa-info-circle me-1"></i>
+              View all posts from this committee
+            </span>
+            }
+            @if(selectedMode === 'chat'){
+              <span>
+              <i class="fas fa-info-circle me-1"></i>
+              Send messages to committee leaders
+            </span>
+            }
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>
+

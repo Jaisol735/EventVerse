@@ -1,0 +1,172 @@
+<div class="chat-grid-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p>Loading chat...</p>
+  </div>
+
+  <!-- Chat Interface -->
+  <div *ngIf="!loading && chat" class="chat-interface">
+    <!-- Chat Header -->
+    <div class="chat-header">
+      <button class="back-btn" (click)="goBack()">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      
+      <div class="chat-info" (click)="openChatInfo()">
+        <div class="chat-avatar" (click)="chat.chat_type === 'group' && canUploadGroupImage() ? openImageUploadModal() : null">
+          <img 
+            [src]="chat.chat_type === 'group' ? groupProfileImage : otherUserProfileImage" 
+            [alt]="getChatTitle()"
+            class="avatar-img"
+            [class.clickable]="chat.chat_type === 'group' && canUploadGroupImage()"
+          />
+          <span *ngIf="chat.chat_type === 'group'" class="group-indicator">
+            <i class="fas fa-users"></i>
+          </span>
+          <!-- Camera icon for group image upload -->
+          <div *ngIf="chat.chat_type === 'group' && canUploadGroupImage()" class="upload-overlay">
+            <i class="fas fa-camera"></i>
+          </div>
+        </div>
+        
+        <div class="chat-details">
+          <h3 class="chat-title">{{getChatTitle()}}</h3>
+          <p class="chat-subtitle">{{getChatSubtitle()}}</p>
+        </div>
+      </div>
+
+      <div class="chat-actions">
+        <button class="action-btn" title="Call">
+          <i class="fas fa-phone"></i>
+        </button>
+        <button class="action-btn" title="Video call">
+          <i class="fas fa-video"></i>
+        </button>
+        <button class="action-btn" title="More options">
+          <i class="fas fa-ellipsis-v"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages Container -->
+    <div class="messages-container" #messagesContainer>
+      <div *ngIf="chat.messages.length === 0" class="empty-messages">
+        <i class="fas fa-comments"></i>
+        <h3>No messages yet</h3>
+        <p>Start the conversation by sending a message!</p>
+      </div>
+
+      <div *ngFor="let message of chat.messages; let i = index" class="message-wrapper">
+        <!-- Date Separator -->
+        <div *ngIf="shouldShowDateSeparator(i)" class="date-separator">
+          <span>{{getMessageDate(message.timestamp)}}</span>
+        </div>
+
+        <!-- Message -->
+        <div 
+          class="message"
+          [class.my-message]="isMyMessage(message)"
+          [class.other-message]="!isMyMessage(message)"
+        >
+          <div *ngIf="!isMyMessage(message) && chat.chat_type === 'group'" class="sender-name">
+            {{message.sender_name}}
+          </div>
+          
+          <div class="message-content">
+            <div class="message-text">{{message.content}}</div>
+            <div class="message-time">{{getMessageTime(message.timestamp)}}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Typing Indicator -->
+      <div *ngIf="typingUsers.length > 0" class="typing-indicator">
+        <div class="typing-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <span class="typing-text">{{getTypingIndicatorText()}}</span>
+      </div>
+    </div>
+
+    <!-- Message Input -->
+    <div class="message-input-container">
+      <!-- Connection Status -->
+      <div *ngIf="!isConnected" class="connection-status">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>Connecting...</span>
+      </div>
+      
+      <div class="message-input-wrapper">
+        <button class="attachment-btn" title="Attach file">
+          <i class="fas fa-paperclip"></i>
+        </button>
+        
+        <textarea
+          class="message-input"
+          placeholder="Type a message..."
+          [(ngModel)]="newMessage"
+          (input)="onMessageInput()"
+          (keydown)="onKeyPress($event)"
+          rows="1"
+          [disabled]="sending || !isConnected"
+        ></textarea>
+        
+        <button 
+          class="send-btn"
+          (click)="sendMessage()"
+          [disabled]="!newMessage.trim() || sending || !isConnected"
+          [title]="sending ? 'Sending...' : 'Send message'"
+        >
+          <i class="fas" [class.fa-paper-plane]="!sending" [class.fa-spinner]="sending" [class.fa-spin]="sending"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!loading && !chat" class="error-container">
+    <i class="fas fa-exclamation-triangle"></i>
+    <h3>Chat not found</h3>
+    <p>The chat you're looking for doesn't exist or you don't have access to it.</p>
+    <button class="btn btn-primary" (click)="goBack()">Go back to chats</button>
+  </div>
+
+  <!-- Group Image Upload Modal -->
+  <div *ngIf="showImageUploadModal" class="modal-overlay" (click)="closeImageUploadModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Update Group Photo</h3>
+        <button class="close-btn" (click)="closeImageUploadModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="current-image">
+          <img [src]="groupProfileImage" alt="Current group photo" class="preview-img" />
+        </div>
+        
+        <div class="upload-section">
+          <input 
+            type="file" 
+            #fileInput 
+            accept="image/*" 
+            (change)="onImageSelected($event)"
+            style="display: none"
+          />
+          <button 
+            class="btn btn-primary upload-btn"
+            (click)="fileInput.click()"
+            [disabled]="uploadingImage"
+          >
+            <i class="fas" [class.fa-upload]="!uploadingImage" [class.fa-spinner]="uploadingImage" [class.fa-spin]="uploadingImage"></i>
+            {{uploadingImage ? 'Uploading...' : 'Choose New Photo'}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

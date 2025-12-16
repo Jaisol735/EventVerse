@@ -1,0 +1,69 @@
+<!-- Replaced entire layout with new structure -->
+<!-- Top Navigation Bar -->
+<app-navbar></app-navbar>
+
+<!-- Main Content Container -->
+<div class="main-container">
+  <div class="container-fluid">
+    <div class="row h-100">
+      
+      <!-- Left Section -->
+      <div class="col-12 col-lg-8 left-section">
+        
+        <!-- Search Bar Section (Top of Left) -->
+        <div class="search-section mb-4">
+          <app-committee-search 
+            (committeeSelected)="onCommitteeSelected($event)">
+          </app-committee-search>
+          @if (showCommitteeContent){
+            <!-- Clear Selection Button -->
+          <div  class="mt-3">
+            <button 
+              class="btn btn-outline-secondary btn-sm"
+              (click)="clearCommitteeSelection()">
+              <i class="fas fa-arrow-left me-2"></i>
+              Back to Feed
+            </button>
+          </div>
+          }
+          
+        </div>
+
+        <!-- Content Section (Bottom of Left) -->
+        <div class="content-section">
+          @if(showCommitteeContent && selectedCommittee){
+            <div >
+            @if(selectedMode === 'posts'){
+              <!-- Committee Posts -->
+               <div >
+              <app-committee-posts [committee]="selectedCommittee"></app-committee-posts>
+            </div>
+            }
+            @if(selectedMode === 'chat'){
+              <!-- Committee Chat -->
+            <div >
+              <app-committee-chat [committee]="selectedCommittee"></app-committee-chat>
+            </div>
+            }
+          </div>
+          }
+          <!-- Committee Content -->
+          @if(!showCommitteeContent){
+            <div >
+                <app-posts-grid [showRecommendations]="true"></app-posts-grid>
+            </div>
+          }
+          <!-- Default Posts Grid -->
+        </div>
+      </div>
+
+      <!-- Right Section - Notifications -->
+      <div class="col-lg-4 d-none d-lg-block right-section">
+        <div class="sticky-notifications">
+          <app-notifications></app-notifications>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

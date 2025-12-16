@@ -1,0 +1,113 @@
+/* Added animated gradient background */
+:host {
+  display: block;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  /* Fallback solid background */
+  background-color: #23a6d5;
+  /* Enhanced gradient with more vibrant colors */
+  background: linear-gradient(
+    -45deg,
+    #ee7752,
+    #e73c7e,
+    #23a6d5,
+    #23d5ab,
+    #f093fb,
+    #f5576c,
+    #4facfe,
+    #00f2fe,
+    #ff6b6b,
+    #4ecdc4,
+    #45b7d1,
+    #96ceb4,
+    #feca57,
+    #ff9ff3,
+    #54a0ff,
+    #5f27cd
+  );
+  background-size: 400% 400%;
+  animation: gradientShift 8s ease-in-out infinite;
+  /* Ensure the animation runs */
+  -webkit-animation: gradientShift 8s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 100% 50%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Added webkit prefix for better browser support */
+@-webkit-keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 100% 50%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.form-control {
+  border: 1px solid #dbdbdb;
+  background-color: #fafafa;
+  font-size: 14px;
+  padding: 12px;
+}
+
+.form-control:focus {
+  border-color: #a8a8a8;
+  box-shadow: none;
+  background-color: white;
+}
+
+.btn-instagram {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 16px;
+}
+
+/* Enhanced card styling for better contrast against animated background */
+.card {
+  max-width: 350px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.text-instagram {
+  font-family: "Billabong", cursive;
+  font-size: 3rem;
+}
+
+@media (max-width: 768px) {
+  .card-body {
+    padding: 2rem 1.5rem !important;
+  }
+
+  .text-instagram {
+    font-size: 2.5rem;
+  }
+}

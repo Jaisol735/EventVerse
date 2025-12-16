@@ -1,0 +1,74 @@
+<div class="committee-chat-container">
+  <!-- Chat Header -->
+  <div class="chat-header">
+    <div class="d-flex align-items-center">
+      <div class="committee-avatar me-3">
+        <i class="fas fa-users text-white"></i>
+      </div>
+      <div>
+        <h6 class="mb-0 fw-bold text-white">{{ committee.name }}</h6>
+        <small class="text-white-50">Chat with committee leaders</small>
+      </div>
+    </div>
+    <div class="chat-status">
+      <i class="fas fa-circle text-success me-1"></i>
+      <small class="text-white-50">Online</small>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="chat-loading text-center py-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading messages...</span>
+    </div>
+    <p class="text-muted mt-2">Loading chat...</p>
+  </div>
+
+  <!-- Chat Messages -->
+  <div *ngIf="!loading" class="chat-messages">
+    <div *ngIf="messages.length === 0" class="empty-chat text-center py-4">
+      <i class="fas fa-comments fs-1 text-muted mb-3"></i>
+      <h6 class="text-muted">Start the conversation</h6>
+      <p class="text-muted small">Send a message to {{ committee.name }} leaders</p>
+    </div>
+
+    <div *ngFor="let message of messages" class="message-wrapper" [class.my-message]="isMyMessage(message)">
+      <div class="message-bubble" [class.sent]="isMyMessage(message)" [class.received]="!isMyMessage(message)">
+        <div *ngIf="!isMyMessage(message)" class="message-sender">
+          {{ message.sender_name || 'Committee Leader' }}
+        </div>
+        <div class="message-text">
+          {{ message.content }}
+        </div>
+        <div class="message-time">
+          {{ getTimeAgo(message.timestamp) }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message Input -->
+  <div class="chat-input">
+    <div class="input-group">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Type your message..."
+        [(ngModel)]="newMessage"
+        (keyup.enter)="sendMessage()"
+        [disabled]="sending"
+      />
+      <button
+        class="btn btn-primary"
+        type="button"
+        (click)="sendMessage()"
+        [disabled]="!newMessage.trim() || sending"
+      >
+        <i *ngIf="!sending" class="fas fa-paper-plane"></i>
+        <div *ngIf="sending" class="spinner-border spinner-border-sm" role="status">
+          <span class="visually-hidden">Sending...</span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>

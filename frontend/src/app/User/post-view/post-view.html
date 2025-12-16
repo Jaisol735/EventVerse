@@ -1,0 +1,42 @@
+full-screen overlay with backdrop blur and centered post 
+<div class="overlay">
+  <button class="back-btn" (click)="goBack()" aria-label="Back">
+    <i class="fas fa-arrow-left"></i>
+    <span>Back</span>
+  </button>
+
+  <div class="content" *ngIf="!loading && post">
+    <div class="media">
+      <img *ngIf="post.type === 'image'" [src]="post.cloudinary_url" alt="Post media" />
+      <video *ngIf="post.type === 'video'" [src]="post.cloudinary_url" controls></video>
+    </div>
+
+    <div class="details">
+      <div class="meta">
+        <div class="author">user_{{ post.author_id }}</div>
+        <div class="likes">
+          <button class="like-btn" [class.liked]="isLiked()" (click)="like()">
+            <i class="{{ isLiked() ? 'fas fa-heart' : 'far fa-heart' }}"></i>
+            <span>{{ post.likes.length }}</span>
+          </button>
+        </div>
+      </div>
+
+      <p class="description">
+        {{ post.description_user || post.description_ai }}
+      </p>
+
+      <div class="hashtags" *ngIf="post.hashtags_ai?.length">
+        <button class="chip" *ngFor="let tag of post.hashtags_ai" (click)="onHashtagClick(tag)">
+          #{{ tag }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="loading">
+    <div class="spinner-border text-light" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+</div>

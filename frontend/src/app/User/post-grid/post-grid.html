@@ -1,0 +1,177 @@
+<div class="posts-grid-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading posts...</span>
+    </div>
+    <p class="text-muted mt-2">Loading posts...</p>
+  </div>
+
+  <!-- No Posts Message -->
+  <div *ngIf="!loading && allPosts.length === 0" class="no-posts-message text-center py-5">
+    <i class="fas fa-images fs-1 text-muted mb-3"></i>
+    <h5 class="text-muted">No posts available</h5>
+    <p class="text-muted">
+      <span *ngIf="committeeId">This committee hasn't posted anything yet.</span>
+      <span *ngIf="!committeeId">No posts to show right now. Check back later!</span>
+    </p>
+  </div>
+
+  <!-- Posts Grid -->
+  <div *ngIf="!loading && allPosts.length > 0" class="posts-grid">
+    <!-- Recommended Posts Section -->
+    <div *ngIf="showRecommendations && recommendedPosts.length > 0" class="mb-4">
+      <h6 class="section-title">
+        <i class="fas fa-star text-warning me-2"></i>
+        Recommended for You
+      </h6>
+      <div class="row g-3">
+        <div *ngFor="let post of recommendedPosts.slice(0, 6)" class="col-12 col-md-6 col-lg-4">
+          <div class="post-card recommended">
+            <div class="post-header">
+              <div class="d-flex align-items-center">
+                <img src="/placeholder.svg?height=32&width=32" alt="User" class="rounded-circle me-2" width="32" height="32">
+                <div>
+                  <h6 class="mb-0 fw-bold">user_{{ post.author_id }}</h6>
+                  <small class="text-muted">{{ getTimeAgo(post.created_at) }}</small>
+                </div>
+              </div>
+              <span class="recommended-badge">
+                <i class="fas fa-star"></i>
+              </span>
+            </div>
+
+            <div class="post-media" (click)="openPost(post)" style="cursor: pointer;">
+              <img *ngIf="post.type === 'image'" [src]="post.cloudinary_url" alt="Post" class="w-100">
+              <video *ngIf="post.type === 'video'" [src]="post.cloudinary_url" class="w-100" controls></video>
+            </div>
+
+            <div class="post-content">
+              <div class="post-actions mb-2">
+                <button class="btn btn-link p-0 me-3" (click)="likePost(post)">
+                  <i [class]="isLikedByUser(post) ? 'fas fa-heart text-danger' : 'far fa-heart'"></i>
+                  <span class="ms-1">{{ post.likes.length }}</span>
+                </button>
+                <button class="btn btn-link p-0">
+                  <i class="far fa-comment"></i>
+                  <span class="ms-1">{{ post.comments.length }}</span>
+                </button>
+              </div>
+
+              <div class="post-description">
+                <strong>user_{{ post.author_id }}</strong>
+                {{ post.description_user || post.description_ai }}
+              </div>
+
+              <div *ngIf="post.hashtags_ai.length > 0" class="post-hashtags mt-1">
+                <span *ngFor="let hashtag of post.hashtags_ai.slice(0, 3)" class="hashtag">#{{ hashtag }}</span>
+              </div>
+
+              <!-- Comments Preview -->
+              <div *ngIf="post.comments.length > 0" class="comments-preview mt-2">
+                <div *ngFor="let comment of post.comments.slice(-1)" class="comment-item">
+                  <strong>user_{{ comment.user_id }}</strong>
+                  {{ comment.text }}
+                </div>
+              </div>
+
+              <!-- Add Comment -->
+              <div class="add-comment mt-2">
+                <div class="input-group input-group-sm">
+                  <input 
+                    type="text" 
+                    class="form-control border-0" 
+                    placeholder="Add a comment..."
+                    [(ngModel)]="newComment[post._id]"
+                    (keyup.enter)="addComment(post)">
+                  <button 
+                    class="btn btn-link text-primary p-1"
+                    (click)="addComment(post)"
+                    [disabled]="!newComment[post._id]?.trim()">
+                    <i class="fas fa-paper-plane"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Latest Posts Section -->
+    <div *ngIf="latestPosts.length > 0 || !showRecommendations">
+      <h6 *ngIf="showRecommendations" class="section-title">
+        <i class="fas fa-clock text-info me-2"></i>
+        Latest Posts
+      </h6>
+      <div class="row g-3">
+        <div *ngFor="let post of (showRecommendations ? latestPosts : allPosts)" class="col-12 col-md-6 col-lg-4">
+          <div class="post-card">
+            <div class="post-header">
+              <div class="d-flex align-items-center">
+                <img src="/placeholder.svg?height=32&width=32" alt="User" class="rounded-circle me-2" width="32" height="32">
+                <div>
+                  <h6 class="mb-0 fw-bold">user_{{ post.author_id }}</h6>
+                  <small class="text-muted">{{ getTimeAgo(post.created_at) }}</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="post-media" (click)="openPost(post)" style="cursor: pointer;">
+              <img *ngIf="post.type === 'image'" [src]="post.cloudinary_url" alt="Post" class="w-100">
+              <video *ngIf="post.type === 'video'" [src]="post.cloudinary_url" class="w-100" controls></video>
+            </div>
+
+            <div class="post-content">
+              <div class="post-actions mb-2">
+                <button class="btn btn-link p-0 me-3" (click)="likePost(post)">
+                  <i [class]="isLikedByUser(post) ? 'fas fa-heart text-danger' : 'far fa-heart'"></i>
+                  <span class="ms-1">{{ post.likes.length }}</span>
+                </button>
+                <button class="btn btn-link p-0">
+                  <i class="far fa-comment"></i>
+                  <span class="ms-1">{{ post.comments.length }}</span>
+                </button>
+              </div>
+
+              <div class="post-description">
+                <strong>user_{{ post.author_id }}</strong>
+                {{ post.description_user || post.description_ai }}
+              </div>
+
+              <div *ngIf="post.hashtags_ai.length > 0" class="post-hashtags mt-1">
+                <span *ngFor="let hashtag of post.hashtags_ai.slice(0, 3)" class="hashtag">#{{ hashtag }}</span>
+              </div>
+
+              <!-- Comments Preview -->
+              <div *ngIf="post.comments.length > 0" class="comments-preview mt-2">
+                <div *ngFor="let comment of post.comments.slice(-1)" class="comment-item">
+                  <strong>user_{{ comment.user_id }}</strong>
+                  {{ comment.text }}
+                </div>
+              </div>
+
+              <!-- Add Comment -->
+              <div class="add-comment mt-2">
+                <div class="input-group input-group-sm">
+                  <input 
+                    type="text" 
+                    class="form-control border-0" 
+                    placeholder="Add a comment..."
+                    [(ngModel)]="newComment[post._id]"
+                    (keyup.enter)="addComment(post)">
+                  <button 
+                    class="btn btn-link text-primary p-1"
+                    (click)="addComment(post)"
+                    [disabled]="!newComment[post._id]?.trim()">
+                    <i class="fas fa-paper-plane"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

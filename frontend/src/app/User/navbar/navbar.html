@@ -1,0 +1,85 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+  <div class="container-fluid px-4">
+    <!-- Brand logo -->
+    <a class="navbar-brand fw-bold text-primary fs-4" href="#">
+      EventVerse
+    </a>
+
+    <!-- Navigation buttons -->
+    <div class="d-flex align-items-center gap-3">
+      
+      <!-- Profile Button -->
+      <div class="position-relative">
+        <button 
+          class="btn btn-outline-primary btn-sm rounded-pill px-3"
+          (click)="toggleProfile()">
+          <i class="fas fa-user me-1"></i>
+          Profile
+        </button>
+        
+        <!-- Profile Dropdown -->
+        <div *ngIf="showProfile" class="dropdown-menu show position-absolute end-0 mt-2">
+          <a class="dropdown-item" routerLink="/profile" (click)="goToProfile()"><i class="fas fa-user me-2"></i>View Profile</a>
+          <a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" routerLink="/login" (click)="logout()">
+            <i class="fas fa-sign-out-alt me-2"></i>Logout
+          </a>
+        </div>
+      </div>
+
+      <!-- Updated notifications button to navigate to notifications page -->
+      <div class="position-relative">
+        <button 
+          class="btn btn-outline-warning btn-sm rounded-pill px-3"
+          (click)="toggleNotifications()">
+          <i class="fas fa-bell me-1"></i>
+          Notifications
+          <!-- Dynamic notification count badge -->
+          <span *ngIf="unreadNotificationCount > 0" class="badge bg-danger rounded-pill ms-1">
+            {{unreadNotificationCount > 99 ? '99+' : unreadNotificationCount}}
+          </span>
+        </button>
+      </div>
+
+      <!-- Updated Chatbox Button to navigate to personal chat -->
+      <div class="position-relative">
+        <button 
+          class="btn btn-outline-success btn-sm rounded-pill px-3"
+          (click)="goToChat()">
+          <i class="fas fa-comments me-1"></i>
+          Chat
+        </button>
+      </div>
+
+      <!-- Upload Post Button -->
+      <button 
+        class="btn btn-outline-info btn-sm rounded-pill px-3"
+        (click)="openUploadPost()">
+        <i class="fas fa-plus me-1"></i>
+        Post
+      </button>
+
+      <!-- Committee Button (only if user is in committee) -->
+      <!-- Updated committee button with dynamic name and proper detection -->
+      <button 
+        *ngIf="isInCommittee()"
+        class="btn btn-outline-secondary btn-sm rounded-pill px-3"
+        (click)="goToCommittee()"
+        [disabled]="isLoadingCommittees">
+        <i class="fas fa-users me-1"></i>
+        {{getCommitteeName()}}
+      </button>
+
+      <!-- Admin Control Button (only if user is admin) -->
+      <button 
+        *ngIf="isAdmin()"
+        class="btn btn-outline-danger btn-sm rounded-pill px-3"
+        (click)="goToAdminControl()">
+        <i class="fas fa-shield-alt me-1"></i>
+        Admin
+      </button>
+
+    </div>
+  </div>
+</nav>

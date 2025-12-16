@@ -1,0 +1,72 @@
+.splash-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* prevent scrollbars */
+  z-index: 1;
+}
+.splash-content h1 {
+  font-size: 3.8rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.8); /* strong shadow */
+  background: rgba(0, 0, 0, 0.4); /* subtle background overlay */
+  padding: 10px 20px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+
+/* Image covers the whole viewport */
+.splash-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;   /* ensures it fills screen without stretching */
+  object-position: center;
+  animation: scaleUp 2s ease-in-out;
+}
+
+@keyframes scaleUp {
+  0% { transform: scale(1.1); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Content stays above */
+.splash-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  color: #fff;
+  text-align: center;
+  animation: fadeIn 1s ease forwards;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+body {
+  margin: 0; /* remove default spacing */
+  background-color: #1e1e2f;
+}
+
+/* Button styling */
+.splash-content .btn {
+  font-size: 1.3rem;     /* bigger text */
+  padding: 12px 28px;    /* bigger button */
+  border-radius: 10px;
+  transition: all 0.4s ease; /* smooth hover */
+  opacity: 0.9;
+}
+
+/* Hover effect: fade + scale */
+.splash-content .btn:hover {
+  transform: scale(1.1); /* grow effect */
+  opacity: 1;            /* fade in */
+  box-shadow: 0px 4px 15px rgba(0,0,0,0.4); /* glowing button */
+}

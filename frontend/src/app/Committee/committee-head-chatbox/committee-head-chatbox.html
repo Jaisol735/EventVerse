@@ -1,0 +1,271 @@
+<div class="committee-head-chatbox">
+  <!-- Access Check -->
+  <div *ngIf="!isCommitteeHead" class="access-denied text-center py-5">
+    <div class="access-denied-icon mb-3">
+      <i class="fas fa-user-shield fa-3x text-muted"></i>
+    </div>
+    <h5 class="text-muted mb-2">Committee Head Only</h5>
+    <p class="text-muted">This feature is only available to committee heads.</p>
+  </div>
+
+  <!-- Main Chatbox Interface -->
+  <div *ngIf="isCommitteeHead" class="chatbox-interface">
+    <div class="row g-0 h-100">
+      <!-- Chat List Sidebar -->
+      <div class="col-md-4 chat-sidebar border-end">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header bg-primary text-white p-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 fw-bold">
+              <i class="fas fa-user-tie me-2"></i>
+              Head Messages
+            </h6>
+            <button 
+              class="btn btn-outline-light btn-sm"
+              (click)="toggleUserSearch()"
+              title="Start new chat"
+            >
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- User Search -->
+        <div *ngIf="showUserSearch" class="user-search p-3 bg-light border-bottom">
+          <div class="search-input-container position-relative">
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0">
+                <i class="fas fa-search text-muted"></i>
+              </span>
+              <input
+                type="text"
+                class="form-control bg-white border-start-0"
+                placeholder="Search users to chat with..."
+                [(ngModel)]="searchQuery"
+                (input)="onSearchInput()"
+                autocomplete="off"
+              />
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                (click)="clearSearch()"
+                title="Clear search"
+              >
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+
+            <!-- Search Loading -->
+            <div *ngIf="searchLoading" class="search-loading text-center mt-2">
+              <div class="spinner-border spinner-border-sm text-primary" role="status">
+                <span class="visually-hidden">Searching...</span>
+              </div>
+            </div>
+
+            <!-- Search Results -->
+            <div *ngIf="showSearchResults && searchResults.length > 0" class="search-results mt-2">
+              <div class="list-group">
+                <button
+                  *ngFor="let user of searchResults"
+                  class="list-group-item list-group-item-action"
+                  (click)="startChatWithUser(user)"
+                >
+                  <div class="d-flex align-items-center">
+                    <div class="user-avatar me-3">
+                      <i class="fas fa-user-circle fa-lg text-primary"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                      <div class="user-name fw-bold">{{ user.name }}</div>
+                      <small class="text-muted">{{ user.email }}</small>
+                      <div class="user-role">
+                        <span class="badge bg-secondary">{{ user.role }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- No Results -->
+            <div *ngIf="showSearchResults && searchResults.length === 0 && searchQuery.length >= 2 && !searchLoading" class="no-results text-center mt-2">
+              <small class="text-muted">No users found for "{{ searchQuery }}"</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat List -->
+        <div class="chat-list">
+          <!-- Loading State -->
+          <div *ngIf="loading" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading chats...</span>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="!loading && chats.length === 0" class="empty-chats text-center py-4">
+            <div class="empty-icon mb-3">
+              <i class="fas fa-comments fa-3x text-muted"></i>
+            </div>
+            <h6 class="text-muted mb-2">No conversations yet</h6>
+            <p class="text-muted small">Start chatting with users by clicking the + button above</p>
+          </div>
+
+          <!-- Chat Items -->
+          <div *ngFor="let chat of chats" 
+               class="chat-item"
+               [class.active]="activeChat?._id === chat._id"
+               (click)="selectChat(chat)">
+            <div class="d-flex align-items-center p-3">
+              <div class="chat-avatar me-3">
+                <i class="fas fa-user-circle fa-lg text-primary"></i>
+              </div>
+              <div class="flex-grow-1 min-width-0">
+                <div class="chat-name fw-bold">{{ getOtherParticipant(chat) }}</div>
+                <div class="last-message text-muted small text-truncate">
+                  {{ chat.last_message?.content || 'No messages yet' }}
+                </div>
+              </div>
+              <div class="chat-time text-muted small">
+                {{ chat.last_message ? getTimeAgo(chat.last_message.timestamp) : '' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Messages Area -->
+      <div class="col-md-8 chat-area">
+        <!-- No Chat Selected -->
+        <div *ngIf="!activeChat" class="no-chat-selected d-flex align-items-center justify-content-center h-100">
+          <div class="text-center">
+            <div class="no-chat-icon mb-3">
+              <i class="fas fa-comment-dots fa-4x text-muted"></i>
+            </div>
+            <h5 class="text-muted mb-2">Select a conversation</h5>
+            <p class="text-muted">Choose a chat from the sidebar or start a new conversation</p>
+          </div>
+        </div>
+
+        <!-- Active Chat -->
+        <div *ngIf="activeChat" class="active-chat d-flex flex-column h-100">
+          <!-- Chat Header -->
+          <div class="chat-header bg-white border-bottom p-3">
+            <div class="d-flex align-items-center">
+              <div class="chat-avatar me-3">
+                <i class="fas fa-user-circle fa-lg text-primary"></i>
+              </div>
+              <div class="flex-grow-1">
+                <h6 class="mb-0 fw-bold">{{ getOtherParticipant(activeChat) }}</h6>
+                <small class="text-muted">
+                  <i class="fas fa-circle text-success me-1" style="font-size: 0.5rem;"></i>
+                  Active now
+                </small>
+              </div>
+              <div class="chat-actions">
+                <button class="btn btn-outline-secondary btn-sm me-2">
+                  <i class="fas fa-phone"></i>
+                </button>
+                <button class="btn btn-outline-secondary btn-sm">
+                  <i class="fas fa-video"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Messages Container -->
+          <div class="messages-container flex-grow-1" #messagesContainer>
+            <!-- Empty Messages -->
+            <div *ngIf="messages.length === 0" class="empty-messages text-center py-4">
+              <div class="empty-icon mb-3">
+                <i class="fas fa-comment fa-3x text-muted"></i>
+              </div>
+              <h6 class="text-muted mb-2">Start the conversation</h6>
+              <p class="text-muted">Send a message to {{ getOtherParticipant(activeChat) }}</p>
+            </div>
+
+            <!-- Messages List -->
+            <div *ngFor="let message of messages" class="message-wrapper">
+              <div 
+                class="message"
+                [class.my-message]="isMyMessage(message)"
+                [class.other-message]="!isMyMessage(message)"
+              >
+                <!-- Other user's message -->
+                <div *ngIf="!isMyMessage(message)" class="message-content">
+                  <div class="message-header">
+                    <div class="user-avatar me-2">
+                      <i class="fas fa-user-circle text-primary"></i>
+                    </div>
+                    <div class="user-info">
+                      <span class="user-name fw-bold">{{ message.sender_name }}</span>
+                      <small class="message-time text-muted ms-2">{{ getTimeAgo(message.timestamp) }}</small>
+                    </div>
+                  </div>
+                  <div class="message-bubble other-bubble">
+                    <p class="mb-0">{{ message.content }}</p>
+                  </div>
+                </div>
+
+                <!-- My message -->
+                <div *ngIf="isMyMessage(message)" class="message-content">
+                  <div class="message-header text-end">
+                    <small class="message-time text-muted me-2">{{ getTimeAgo(message.timestamp) }}</small>
+                    <span class="user-name fw-bold">You</span>
+                  </div>
+                  <div class="message-bubble my-bubble">
+                    <p class="mb-0">{{ message.content }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Typing Indicator -->
+            <div *ngIf="typingUsers.length > 0" class="typing-indicator">
+              <div class="typing-bubble">
+                <div class="typing-dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+              <small class="text-muted ms-2">{{ getTypingText() }}</small>
+            </div>
+          </div>
+
+          <!-- Message Input -->
+          <div class="message-input bg-light border-top p-3">
+            <div class="input-group">
+              <input 
+                type="text" 
+                class="form-control" 
+                placeholder="Type a message..."
+                [(ngModel)]="newMessage"
+                (keypress)="onKeyPress($event)"
+                (keyup)="onKeyUp()"
+                [disabled]="sending"
+                maxlength="1000"
+              >
+              <button 
+                class="btn btn-primary" 
+                (click)="sendMessage()"
+                [disabled]="!newMessage.trim() || sending"
+              >
+                <i *ngIf="!sending" class="fas fa-paper-plane"></i>
+                <div *ngIf="sending" class="spinner-border spinner-border-sm" role="status">
+                  <span class="visually-hidden">Sending...</span>
+                </div>
+              </button>
+            </div>
+            <div class="input-footer mt-2 text-center">
+              <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                Press Enter to send • Committee Head Chat
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

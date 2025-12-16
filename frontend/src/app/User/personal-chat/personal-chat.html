@@ -1,0 +1,186 @@
+<div class="personal-chat-container">
+  <!-- Header -->
+  <div class="chat-header">
+    <h2 class="chat-title">Messages</h2>
+    <button class="btn btn-primary group-chat-btn" (click)="openGroupChatModal()">
+      <i class="fas fa-users"></i> New Group
+    </button>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-container">
+    <div class="search-input-wrapper">
+      <i class="fas fa-search search-icon"></i>
+      <input
+        type="text"
+        class="form-control search-input"
+        placeholder="Search users to start a chat..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearchInput()"
+        (focus)="showSearchResults = true"
+      />
+      <button 
+        *ngIf="searchQuery" 
+        class="clear-search-btn"
+        (click)="searchQuery = ''; clearSearch()"
+      >
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    @if(showSearchResults && searchResults.length > 0){
+      <!-- Search Results -->
+      <div class="search-results">
+      <div 
+        *ngFor="let user of searchResults" 
+        class="search-result-item"
+        (click)="startPersonalChat(user)"
+      >
+        <div class="user-avatar">
+          <img 
+            [src]="userProfileImages[user.user_id]"
+            alt="{{user.name}}"
+            class="avatar-img"
+          />
+        </div>
+        <div class="user-info">
+          <div class="user-name">{{user.name}}</div>
+          <div class="user-email">{{user.email}}</div>
+        </div>
+        <div class="user-role">
+          <span class="role-badge" [class]="'role-' + user.role">{{user.role}}</span>
+        </div>
+      </div>
+    </div>
+    }
+    
+    
+
+    <div *ngIf="showSearchResults && searchQuery && searchResults.length === 0" class="no-results">
+      <i class="fas fa-search"></i>
+      <p>No users found for "{{searchQuery}}"</p>
+    </div>
+  </div>
+
+  <!-- Chat List -->
+  <div class="chat-list">
+    <div *ngIf="loading" class="loading-state">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Loading chats...</p>
+    </div>
+
+    <div *ngIf="!loading && chats.length === 0" class="empty-state">
+      <i class="fas fa-comments"></i>
+      <h3>No conversations yet</h3>
+      <p>Search for users above to start your first chat!</p>
+    </div>
+
+    <div 
+      *ngFor="let chat of chats" 
+      class="chat-item"
+      (click)="openChat(chat)"
+    >
+      <div class="chat-avatar">
+        <img 
+          [src]="chat.chat_type === 'personal' ? userProfileImages[getOtherParticipantId(chat)] || '/default-user-avatar.png' : '/default-user-avatar.png'" 
+          alt="Chat avatar"
+          class="avatar-img"
+        />
+        <span *ngIf="chat.chat_type === 'group'" class="group-indicator">
+          <i class="fas fa-users"></i>
+        </span>
+      </div>
+      
+      <div class="chat-info">
+        <div class="chat-name">{{getChatDisplayName(chat)}}</div>
+        <div class="chat-last-message">{{getChatLastMessage(chat)}}</div>
+      </div>
+      
+      <div class="chat-meta">
+        <div class="chat-time">{{getTimeAgo(chat.updated_at || chat.created_at!)}}</div>
+        <div *ngIf="chat.chat_type === 'group'" class="participant-count">
+          {{chat.participants.length}} members
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Group Chat Modal -->
+  <div *ngIf="showGroupChatModal" class="modal-overlay" (click)="closeGroupChatModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Create Group Chat</h3>
+        <button class="close-btn" (click)="closeGroupChatModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="groupName">Group Name</label>
+          <input
+            id="groupName"
+            type="text"
+            class="form-control"
+            placeholder="Enter group name..."
+            [(ngModel)]="groupChatName"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Search and select users</label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Search users..."
+            [(ngModel)]="searchQuery"
+            (input)="onSearchInput()"
+          />
+        </div>
+
+        <div *ngIf="selectedUsers.length > 0" class="selected-users">
+          <h4>Selected Users ({{selectedUsers.length}})</h4>
+          <div class="selected-user-list">
+            <span 
+              *ngFor="let user of selectedUsers" 
+              class="selected-user-tag"
+              (click)="toggleUserSelection(user)"
+            >
+              {{user.name}} <i class="fas fa-times"></i>
+            </span>
+          </div>
+        </div>
+
+        <div *ngIf="searchResults.length > 0" class="user-selection-list">
+          <div 
+            *ngFor="let user of searchResults" 
+            class="user-selection-item"
+            (click)="toggleUserSelection(user)"
+            [class.selected]="isUserSelected(user)"
+          >
+            <div class="user-avatar">
+              <img src="/default-user-avatar.png" alt="{{user.name}}" class="avatar-img" />
+            </div>
+            <div class="user-info">
+              <div class="user-name">{{user.name}}</div>
+              <div class="user-email">{{user.email}}</div>
+            </div>
+            <div class="selection-indicator">
+              <i class="fas" [class.fa-check-circle]="isUserSelected(user)" [class.fa-circle]="!isUserSelected(user)"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeGroupChatModal()">Cancel</button>
+        <button 
+          class="btn btn-primary" 
+          (click)="createGroupChat()"
+          [disabled]="!groupChatName.trim() || selectedUsers.length === 0"
+        >
+          Create Group
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

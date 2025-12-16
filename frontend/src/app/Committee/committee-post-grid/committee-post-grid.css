@@ -1,0 +1,159 @@
+.committee-post-grid {
+  width: 100%;
+}
+
+.grid-header {
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 1rem;
+}
+
+.empty-state {
+  background-color: #f8f9fa;
+  border-radius: 0.5rem;
+  border: 2px dashed #dee2e6;
+}
+
+.empty-icon {
+  opacity: 0.5;
+}
+
+.posts-grid .post-card {
+  background: white;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.posts-grid .post-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.post-image-container {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+}
+
+.post-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.post-card:hover .post-image {
+  transform: scale(1.05);
+}
+
+.post-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.post-card:hover .post-overlay {
+  opacity: 1;
+}
+
+.post-stats {
+  display: flex;
+  gap: 1rem;
+  color: white;
+  font-weight: 500;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.post-info {
+  background: white;
+}
+
+.post-description {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: #495057;
+}
+
+.modal.show {
+  display: block !important;
+}
+
+.post-details {
+  height: 500px;
+  overflow-y: auto;
+}
+
+.comment {
+  font-size: 0.875rem;
+}
+
+.comment-avatar {
+  flex-shrink: 0;
+}
+
+.comment-content {
+  min-width: 0;
+}
+
+.comment-text {
+  word-wrap: break-word;
+}
+
+.hashtags .badge {
+  font-size: 0.75rem;
+}
+
+.btn-link {
+  text-decoration: none;
+  border: none;
+  background: none;
+}
+
+.btn-link:hover {
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .posts-grid .row {
+    --bs-gutter-x: 0.5rem;
+  }
+
+  .posts-grid .col-sm-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+
+  .modal-body .row {
+    flex-direction: column;
+  }
+
+  .modal-body .col-md-8,
+  .modal-body .col-md-4 {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .post-details {
+    height: auto;
+    max-height: 300px;
+  }
+}

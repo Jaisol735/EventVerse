@@ -1,0 +1,18 @@
+<div class="splash-container" [@blurAnimation]="showContent ? 'blur' : 'normal'">
+  <!-- ✅ Correct path for Angular public/ folder -->
+  <img src="/Images/EventVerse.png" alt="EventVerse" class="splash-image">
+</div>
+
+@if(showContent){
+  <ng-container>
+    <div class="splash-content text-center" [@fadeInAnimation]="'show'">
+      <div>
+        <h1 class="display-4 fw-bold">EventVerse</h1>
+      </div>
+      <div class="mt-4">
+        <button class="btn btn-primary me-3" (click)="navigate('login')">Login</button>
+        <button class="btn btn-success" (click)="navigate('signup')">Signup</button>
+      </div>
+    </div>
+  </ng-container>
+}

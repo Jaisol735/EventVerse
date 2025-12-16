@@ -1,0 +1,44 @@
+/* Button animation */
+  .btn-animate {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .btn-animate::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 0;
+    top: 0;
+    left: 0;
+    background: rgba(255,255,255,0.2);
+    transition: all 0.3s ease-in-out;
+    border-radius: inherit;
+  }
+
+  .btn-animate:hover::after {
+    height: 100%;
+  }
+
+  .btn-animate:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  }
+
+  /* Form card */
+  form.card {
+    background: #ffffff;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  form.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  }
+
+  /* Selected file text */
+  p.fw-semibold {
+    font-size: 1rem;
+    color: #495057;
+  }

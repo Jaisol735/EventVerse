@@ -1,0 +1,136 @@
+/* Updated CSS for new layout structure with navbar, left/right sections */
+.main-container {
+  min-height: calc(100vh - 70px); /* Account for navbar height */
+  background: #fafafa;
+  padding-top: 1rem;
+}
+
+.left-section {
+  padding: 0 1rem;
+}
+
+.right-section {
+  padding: 0 1rem;
+  background: #fafafa;
+}
+
+.search-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+}
+
+.content-section {
+  background: white;
+  border-radius: 12px;
+  min-height: 500px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+}
+
+.sticky-notifications {
+  position: sticky;
+  top: 90px; /* Account for navbar + padding */
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
+}
+
+/* Kept existing Instagram-style components for compatibility */
+.navbar-instagram {
+  background: white;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+.post-card {
+  max-width: 470px;
+  margin: 0 auto 24px;
+}
+
+.story-circle {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+}
+
+.story-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid white;
+  overflow: hidden;
+}
+
+.card-instagram {
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  background: white;
+}
+
+.text-instagram {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: bold;
+  font-family: "Billabong", cursive;
+}
+
+.btn-link:hover {
+  text-decoration: none !important;
+}
+
+.object-fit-cover {
+  object-fit: cover;
+}
+
+/* Updated responsive design for new layout */
+@media (max-width: 992px) {
+  .right-section {
+    display: none !important;
+  }
+
+  .left-section {
+    padding: 0 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-container {
+    padding-top: 0.5rem;
+  }
+
+  .search-section,
+  .content-section {
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+
+  .search-section {
+    padding: 1rem;
+  }
+
+  .post-card {
+    margin: 0 0 24px;
+  }
+
+  .card-instagram {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .left-section {
+    padding: 0 0.25rem;
+  }
+
+  .search-section,
+  .content-section {
+    border-radius: 6px;
+  }
+}
